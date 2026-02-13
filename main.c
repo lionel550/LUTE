@@ -54,6 +54,20 @@ void send_command(uint8_t command)
     _delay_ms(2);
 }
 
+uint16_t analog_read(uint8_t channel)
+{
+    // Select the channel and set VCC as reference
+    ADMUX &= 0x0;
+    ADMUX = _BV(REFS0) | channel;
+    
+    // Start ADC and set prescaler at 128
+    ADCSRA |= _BV(ADEN) | _BV(ADPS2) | _BV(ADPS1) | _BV(ADPS0) | _BV(ADSC);
+
+    while (ADCSRA & 0x40) { /* nothing to do */ }
+    
+    return ADC;
+}
+
 
 void init_lcd()
 {
