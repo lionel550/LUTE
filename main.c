@@ -28,6 +28,8 @@
 #define LCD_FUNCTION_SET_4_BITS          0x2
 #define LCD_FUNCTION_SET_8_BITS          0x3
 #define LCD_FUNCTION_SET_4_BITS_2_LINES  0x28
+#define LCD_CURSOR_AT_1ST_LINE           0x80
+#define LCD_CURSOR_AT_2ND_LINE           0xC0
 
 #define EXTRACT_HIGH_ORDER_BITS(value) (value >> 4)
 #define EXTRACT_LOW_ORDER_BITS(value) (value & 0xF)
@@ -176,14 +178,34 @@ void display_temperature()
     display_text(" C");
 }
 
+void display_luminance()
+{
+    char buffer[5] = {0};
+
+    uint16_t luminance = analog_read(PHOTORESISTOR_PIN);
+
+    int_to_string(luminance, buffer, sizeof(buffer));
+
+    display_text("LIGHT: ");
+    display_text(buffer);
+    display_text(" LUX");
+}
+
 int main(void)
 { 
     setup();
     
     for(;;)
     {
-        send_command(LCD_CLEAR_DISPLAY);  
+        send_command(LCD_CLEAR_DISPLAY);
+        send_command(LCD_CURSOR_AT_1ST_LINE);
+        
         display_temperature();
+        
+        send_command(LCD_CURSOR_AT_2ND_LINE);
+        
+        display_luminance();
+
         _delay_ms(2000);
     }
 
