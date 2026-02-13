@@ -46,6 +46,17 @@ void write_niddle(uint8_t value)
     _delay_ms(1);
 }
 
+void display_text(char *text)
+{
+    PORTB |= _BV(PB4);
+    for (int i = 0; i < strlen(text); i++)
+    {
+      write_niddle(EXTRACT_HIGH_ORDER_BITS(text[i]));
+      write_niddle(EXTRACT_LOW_ORDER_BITS(text[i]));
+      _delay_us(50);
+    }
+}
+
 void send_command(uint8_t command)
 {
     PORTB &= ~_BV(PB4);
@@ -67,7 +78,6 @@ uint16_t analog_read(uint8_t channel)
     
     return ADC;
 }
-
 
 void init_lcd()
 {
