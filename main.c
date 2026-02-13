@@ -17,6 +17,9 @@
 
 #include <avr/io.h>
 #include <util/delay.h>
+#include <math.h>
+#include <string.h>
+#include <stddef.h>
 
 #define LCD_DISPLAY_OFF                  0x8
 #define LCD_DISPLAY_ON                   0xC
@@ -28,6 +31,25 @@
 
 #define EXTRACT_HIGH_ORDER_BITS(value) (value >> 4)
 #define EXTRACT_LOW_ORDER_BITS(value) (value & 0xF)
+
+#define THERMISTOR_PIN     0
+#define PHOTORESISTOR_PIN  1
+
+int VO;
+float R1 = 10000;
+float LOG_R2, R2;
+float C1 = 1.009249522e-03, C2 = 2.378405444e-04, C3 = 2.019202697e-07;
+
+uint16_t analog_read(uint8_t channel);
+
+float read_temperature()
+{
+    VO = analog_read(THERMISTOR_PIN);
+    R2 = R1 * (1023.0 / (float)VO - 1.0);
+    LOG_R2 = log(R2);
+    float temperature = (1.0 / (C1 + C2 * LOG_R2 + C3 * LOG_R2 * LOG_R2 * LOG_R2));
+    return temperature - 273.15;
+}
 
 void write_niddle(uint8_t value)
 {
@@ -79,6 +101,34 @@ uint16_t analog_read(uint8_t channel)
     return ADC;
 }
 
+// Doesn't handle negative number
+void int_to_string(int i, char buffer[], size_t size)
+{
+    int index = 0;
+
+    if (i == 0) {
+        buffer[i] = '0';
+        buffer[i + 1] = '\0';
+        return;
+    }
+
+    int div = 1;
+    while (div * 10 < i) {
+        div *= 10;
+    }
+
+    int rest = i;
+    while (rest != 0 && index < size - 1)
+    {
+        buffer[index] = '0' + (rest / div);
+        rest = rest % div;
+        div /= 10;
+        index++;
+    }
+
+    buffer[index] = '\0';
+}
+
 void init_lcd()
 {
     _delay_ms(40);   
@@ -109,13 +159,32 @@ void setup()
     init_lcd();
 }
 
-int main(void)
+void display_temperature()
 {
-    setup();
+    char buffer_1[5] = {0};
+    char buffer_2[5] = {0};
 
+    float temperature = read_temperature();
+
+    int_to_string((int)temperature, buffer_1, sizeof(buffer_1));
+    int_to_string((int)((temperature - (int)temperature) * 10), buffer_2, sizeof(buffer_2));
+    
+    display_text("TEMP: ");
+    display_text(buffer_1);
+    display_text(".");
+    display_text(buffer_2);
+    display_text(" C");
+}
+
+int main(void)
+{ 
+    setup();
+    
     for(;;)
     {
-        // Nothing to do
+        send_command(LCD_CLEAR_DISPLAY);  
+        display_temperature();
+        _delay_ms(2000);
     }
 
     return 0;
