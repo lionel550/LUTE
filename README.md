@@ -12,7 +12,9 @@
 - LCD Screen (compatible with Hitachi HD44780 driver)
 - 10k ohm potentiometer
 
-TOOD: Add the circuit image
+![LCD Wiring](assets/ref_wiring_lcd_display.png "LCD Display wiring")
+![Thermistor Wiring](assets/ref_wiring_thermistor.jpg "Thermistor wiring")
+![Photoresistor Wiring](assets/ref_wiring_photoresistor.jpg "Photoresistor wiring")
 
 ## Pin Mapping
 
@@ -26,6 +28,8 @@ TOOD: Add the circuit image
 | **RS** | PB4 |
 | **VSS / R/W** | Ground |
 | **VDD** | 5V |
+| **Thermistor**| A0 |
+| **Photoresistor** | A1 |
 
 ## Dependencies
 You need the `avr-libc` toolchain to compile the project.
@@ -44,7 +48,7 @@ make upload   # Flash to the Arduino
 ```
 
 ## Demo
-TODO: Add a video of the system
+[![Watch the video](assets/lute.jpg)](assets/lute.mp4)
 
 ## References
 - [arduino](https://docs.arduino.cc/hardware/uno-rev3/)
