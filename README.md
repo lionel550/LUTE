@@ -48,7 +48,7 @@ make upload   # Flash to the Arduino
 ```
 
 ## Demo
-[![Watch the video](assets/lute.jpg)](assets/lute.mp4)
+https://github.com/user-attachments/assets/fd8a656e-5436-48ab-84ef-243d97d51cec
 
 ## References
 - [arduino](https://docs.arduino.cc/hardware/uno-rev3/)
